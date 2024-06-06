@@ -1,25 +1,26 @@
-#!/bin/sh
-# Change for whatever shell you like or leave as it is!
-
-# There should be all my functions first.
-
+#!/bin/zsh
 function daily(){
-  # Check if SN_DIRECTORY exists and create if not
-  if [ ! -d $SN_DIRECTORY ]
+  # Check if SN_DIR and SN_DAILY_DIR exists and create if not
+  if [ ! -d $SN_DIR ]
   then
-  mkdir "$SN_DIRECTORY"
+  mkdir -p "$SN_DIR"
+  fi
+
+  if [ ! -d $SN_DAILY_DIR ]
+  then
+  mkdir -p "$SN_DAILY_DIR"
   fi
 
   # If there is no daily note with today's date in specified format,
   # then we should create one
-  if [ ! -f "$SN_DIRECTORY/$(date +"$SN_DATE_FORMAT").$SN_FILE_FORMAT" ]
+  if [ ! -f "$SN_DAILY_DIR/$(date +"$SN_DATE_FORMAT").$SN_FILE_FORMAT" ]
   then
-  touch "$SN_DIRECTORY/$(date +"$SN_DATE_FORMAT").$SN_FILE_FORMAT"
+  touch "$SN_DAILY_DIR/$(date +"$SN_DATE_FORMAT").$SN_FILE_FORMAT"
   fi
 
   # Now we sure that there is today's daily note, so we can
   # open it with specified editor
-  $SN_EDITOR "$SN_DIRECTORY/$(date +$SN_DATE_FORMAT).$SN_FILE_FORMAT"
+  $SN_EDITOR "$SN_DIR/$(date +$SN_DATE_FORMAT).$SN_FILE_FORMAT"
 }
 
 function open_or_create(){
@@ -27,10 +28,26 @@ function open_or_create(){
   # Then open with specified editor
   if [ ! -f "$1.$SN_FILE_FORMAT" ]
   then
-    touch "$SN_DIRECTORY/$1.$SN_FILE_FORMAT"
+    touch "$SN_DIR/$1.$SN_FILE_FORMAT"
   fi
-  $SN_EDITOR "$SN_DIRECTORY/$1.$SN_FILE_FORMAT"
+  $SN_EDITOR "$SN_DIR/$1.$SN_FILE_FORMAT"
 }
+
+function search(){
+  f=$(find "$SN_DIR"\
+    -type f\
+    -name "*.$SN_FILE_FORMAT"\
+    -exec basename {} .$SN_FILE_FORMAT \;)
+ fnd=$(echo $f | fzf -i)
+ echo $fnd
+}
+
+function append(){
+  echo i should append this
+  echo "$1"
+  echo to daily note
+}
+
 # If no arguements provided, we open today's daily note
 if [ -z $1 ]
   then
@@ -41,8 +58,14 @@ fi
 # If there is one argument and it's not a command, we create or
 # open a note with specified name
 case $1 in
+  s)
+    search "$2"
+    ;;
+  a)
+    shift
+    append "$@"
+    ;;
   *)
-    note_name="$*"
-    open_or_create "$note_name"
+    open_or_create "$*"
     ;;
 esac
