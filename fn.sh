@@ -1,40 +1,40 @@
 #!/bin/zsh
 
 function init(){
-  if [ ! -d $SN_DIR ]
+  if [ ! -d $FN_DIR ]
   then
-  mkdir -p "$SN_DIR"
+  mkdir -p "$FN_DIR"
   fi
 
-  if [ ! -d $SN_DAILY_DIR ]
+  if [ ! -d $FN_DAILY_DIR ]
   then
-  mkdir -p "$SN_DAILY_DIR"
+  mkdir -p "$FN_DAILY_DIR"
   fi
 
-  if [ ! -f "$SN_DAILY_DIR/$(date +$SN_DATE_FORMAT).$SN_FILE_FORMAT" ]
+  if [ ! -f "$FN_DAILY_DIR/$(date +$FN_DATE_FORMAT).$FN_FILE_FORMAT" ]
   then
-    touch "$SN_DIR/$(date +$SN_DATE_FORMAT).$SN_FILE_FORMAT"
+    touch "$FN_DIR/$(date +$FN_DATE_FORMAT).$FN_FILE_FORMAT"
   fi
 }
 
 function daily(){
-  $SN_EDITOR "$SN_DAILY_DIR/$(date +$SN_DATE_FORMAT).$SN_FILE_FORMAT"
+  $FN_EDITOR "$FN_DAILY_DIR/$(date +$FN_DATE_FORMAT).$FN_FILE_FORMAT"
 }
 
 function open_or_create(){
-  if [ ! -f "$SN_DIR.$1.$SN_FILE_FORMAT" ]
+  if [ ! -f "$FN_DIR.$1.$FN_FILE_FORMAT" ]
   then
-    touch "$SN_DIR/$1.$SN_FILE_FORMAT"
+    touch "$FN_DIR/$1.$FN_FILE_FORMAT"
   fi
-  $SN_EDITOR "$SN_DIR/$1.$SN_FILE_FORMAT"
+  $FN_EDITOR "$FN_DIR/$1.$FN_FILE_FORMAT"
 }
 
 function search(){
-  f=$(find "$SN_DIR"\
+  f=$(find "$FN_DIR"\
     -maxdepth 1\
     -type f\
-    -name "*.$SN_FILE_FORMAT"\
-    -exec basename {} .$SN_FILE_FORMAT \;)
+    -name "*.$FN_FILE_FORMAT"\
+    -exec basename {} .$FN_FILE_FORMAT \;)
  fnd=$(echo $f | fzf -i)
 
  if [[ -n "$fnd" ]]
@@ -44,7 +44,7 @@ function search(){
 }
 
 function append(){
-  echo "$1" >> "$SN_DAILY_DIR/$(date +$SN_DATE_FORMAT).$SN_FILE_FORMAT"
+  echo "$1" >> "$FN_DAILY_DIR/$(date +$FN_DATE_FORMAT).$FN_FILE_FORMAT"
 }
 
 #MAIN
